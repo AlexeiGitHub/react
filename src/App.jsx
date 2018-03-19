@@ -1,33 +1,37 @@
 import React, { Component } from 'react';
-
 import Menu from './Menu';
+import Axios from 'axios';
+import { createStore } from 'redux';
 
-let arr = [
-    {
-        name: 'dafault User1',
-        age: '11'
-    },
-    {
-        name: 'dafault User2',
-        age: '33'
-    },
-    {
-        name: 'dafault User3',
-        age: '22'
-    },
-];
+function Users(state = [], action) {
+    if(action.type === 'LoadData') {
+        return action.data;
+    }
+    return state;
+}
+
+const store = createStore(Users);
+
+Axios.get('http://localhost:5001/users')
+    .then(function(response) {
+        store.dispatch({ type: 'LoadData', data: response.data });
+    });
 
 class App extends Component {
     constructor(props) {
         super(props);
-        this.state = { users: arr }
+        this.state = {arr: []};
+        store.subscribe(() => {
+            this.setState({arr: store.getState()});
+        });
     }
+
     render() {
         return (
             <div>
                 <Menu/>
                 <div>
-                    {this.state.users.map((item, index) =>
+                    {store.getState().map((item, index) =>
                         <h4 key={index}>Name: {item.name} | age: {item.age}</h4>
                     )}
                 </div>

@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import Axios from 'axios';
 
 import Menu from './Menu';
 import { css } from 'aphrodite';
@@ -18,10 +19,26 @@ class Users extends Component {
     }
 
     submit(event) {
-        event.preventDefault();
+        /*event.preventDefault();
         console.log('submit', this.state.name);
         let text = 'User with name ' + this.state.name + ' Can not be added to the database. The database does not exist!';
-        this.setState({text: text});
+        this.setState({text: text});*/
+        if(this.state.name !== '' && this.state.age !== '') {
+            Axios.post('http://localhost:5001/user', {
+                name: this.state.name,
+                age: this.state.age
+            })
+                .then(function (response) {
+                    console.log(response);
+                    location.reload();
+                })
+                .catch(function (error) {
+                    console.log(error);
+                });
+        } else{
+            let text = 'One of the fields is empty';
+            this.setState({text: text});
+        }
     };
 
     nameChange(event) {
