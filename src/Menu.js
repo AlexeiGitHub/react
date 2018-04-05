@@ -9,8 +9,10 @@ class Menu extends Component {
     render() {
         return (
           <div className={css(styles.block)}>
-            <Link className={css(styles.nav)} to="/">List User</Link>
-            <Link className={css(styles.nav)} to="/user">Add User</Link>
+              <Link className={css(styles.nav)} to="/user">Create</Link>
+              <Link className={css(styles.nav)} to="/">Read</Link>
+              <Link className={css(styles.nav)} to="/up">Update</Link>
+              <Link className={css(styles.nav)} to="/del">Delete</Link>
           </div>
         );
     }

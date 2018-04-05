@@ -13,8 +13,8 @@ function Users(state = [], action) {
 const store = createStore(Users);
 
 Axios.get('http://localhost:5001/users')
-    .then(function(response) {
-        store.dispatch({ type: 'LoadData', data: response.data });
+    .then(function(res) {
+        store.dispatch({ type: 'LoadData', data: res.data });
     });
 
 class App extends Component {
