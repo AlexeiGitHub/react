@@ -2,7 +2,7 @@ import { StyleSheet } from 'aphrodite';
 
 export default StyleSheet.create({
     nav: {
-        marginRight: '20px',
+        marginRight: '64px',
         fontWeight: '700',
         color: 'white',
         textDecoration: 'none',
@@ -25,7 +25,9 @@ export default StyleSheet.create({
         marginBottom: '30px'
     },
 
-    paragraf: {
-        color: '#FF0000'
-    }
+    block2: {
+        marginTop: '45px',
+        border: '2px solid #3bc47e',
+        padding: '5px 20px'
+    },
 });

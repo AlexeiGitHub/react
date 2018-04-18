@@ -1,71 +1,51 @@
 import React, { Component } from 'react';
 import Axios from 'axios';
+import { connect } from 'react-redux';
 
 import Menu from './Menu';
-//import { css } from 'aphrodite';
-//import styles from './MenuStyles'; //I did not want to create a file for UserStyle
-import { createStore } from 'redux';
-
-function Users(state = [], action) {
-    if(action.type === 'LoadData') {
-        return action.data;
-    }
-    return state;
-}
-
-const store = createStore(Users);
-
-store.subscribe(() => {
-    console.log('subscribe: ', store.getState());
-});
-
-Axios.get('http://localhost:5001/users')
-    .then(function(res) {
-        store.dispatch({ type: 'LoadData', data: res.data });
-    });
+import List from './List';
 
 class Delete extends Component {
-    constructor(props) {
-        super(props);
-        this.state = {
 
-        };
-        this.submit = this.submit.bind(this);
+    deleteUser(event) {
+        let id = event.target.name;
+        console.log(typeof event.target.name);
+        let address = 'http://localhost:5001/user/' + id;
+        Axios.delete(address)
+            .then((res) => {
+                this.props.onDeleteUser(id);
+            })
+            .catch((err) => {
+                console.log(err);
+            });
     }
 
-    submit(event) {
-        if(this.state.name !== '' && this.state.age !== '') {
-            let address = 'http://localhost:5001/user/' + event.target.name;
-            //console.log(addres);
-            Axios.delete(address)
-                .then(function (res) {
-                    console.log(res);
-                    location.reload();
-                })
-                .catch(function (err) {
-                    console.log(err);
-                });
-        } else{
-            let texts = 'One of the fields is empty';
-            this.setState({text: texts});
-        }
-    };
 
     render() {
         return (
             <div>
                 <Menu/>
-
-
                     <div>
-                        {store.getState().map((item, index) =>
-                            <h4 key={index}> <input type="submit" name={item._id}  value='Delete' onClick={this.submit} /> Name: {item.name} | age: {item.age}</h4>
+                        {this.props.store.map((user, index) =>
+                            <h4 key={index}>
+                                <input type="submit" name={user._id}  value='Delete' onClick={this.deleteUser.bind(this)} />
+                                   --> Name: {user.name} | age: {user.age}
+                            </h4>
                         )}
                     </div>
-
+                <List/>
             </div>
         );
     }
 }
 
-export default Delete;
+export default connect(
+    state => ({
+        store: state
+    }),
+    dispatch => ({
+        onDeleteUser: (id) => {
+            dispatch({type: 'DELETE_USER', data: id})
+        }
+    })
+)(Delete);
