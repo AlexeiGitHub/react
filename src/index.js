@@ -1,17 +1,10 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { Provider } from 'react-redux';
-import { HashRouter, Route } from 'react-router-dom';
 import { createStore } from 'redux';
 import Axios from 'axios';
 
-import addUser from './addUser';
-import Update from  './update';
-import Delete from './delete';
-
-import { css } from 'aphrodite';
-import styles from './indexStyle';
-
+import App from './App';
 
 function payload(state = [], action) {
     if (action.type === 'ADD_USER') {
@@ -24,7 +17,7 @@ function payload(state = [], action) {
         for(let i = 0; i < state.length; i++){
             if(state[i]._id === action.data._id) {
                 state[i] = action.data;
-                console.log(state);
+                //console.log(state);
                 return [
                     ...state
                 ];
@@ -36,7 +29,7 @@ function payload(state = [], action) {
         for(let i = 0; i < state.length; i++){
             if(state[i]._id === action.data) {
                 state.splice(i, 1);
-                console.log(state);
+                //console.log(state);
                 return [
                     ...state
                 ];
@@ -60,13 +53,7 @@ Axios.get('http://localhost:5001/users')
 
 ReactDOM.render(
     <Provider store={store}>
-        <HashRouter>
-            <div className={css(styles.container)}>
-                <Route exact path="/" component={addUser} />
-                <Route  path="/up" component={Update} />
-                <Route  path="/del" component={Delete} />
-            </div>
-        </HashRouter>
+        <App/>
     </Provider>,
     document.getElementById('root')
 );
