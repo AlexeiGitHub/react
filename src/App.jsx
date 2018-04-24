@@ -2,53 +2,34 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import Axios from 'axios';
 
-import { css } from 'aphrodite/no-important';
-import styles from './AppStyle';
+import './App.css';
 
 let arr = [];
-let active;
+let active = '';
 
 class App extends Component {
 
-    over(event) {
-        if(event.currentTarget.firstChild.firstChild.nextSibling.checked === true) {
-            //event.currentTarget.firstChild.firstChild.nextSibling.nextSibling.nextSibling.style.visibility = 'visible';
-        } else {
-            event.currentTarget.firstChild.firstChild.nextSibling.nextSibling.nextSibling.style.visibility = 'visible';
-            event.currentTarget.firstChild.firstChild.nextSibling.style.visibility = 'visible';
-            event.currentTarget.firstChild.firstChild.style.visibility = 'visible';
-        }
-    }
+    onClickBtnAddUser() {
 
-    out(event) {
-        if(event.currentTarget.firstChild.firstChild.nextSibling.checked !== true) {
-            event.currentTarget.firstChild.firstChild.style.visibility = 'hidden';
-            event.currentTarget.firstChild.firstChild.nextSibling.style.visibility = 'hidden';
-            event.currentTarget.firstChild.firstChild.nextSibling.nextSibling.nextSibling.style.visibility = 'hidden';
-        } else {
-            event.currentTarget.firstChild.firstChild.nextSibling.nextSibling.nextSibling.style.visibility = 'hidden';
-        }
-    }
+        let btnAddUser = this.btnAddUser;
+        let formBlock = this.formBlock;
+        let btnCreate = this.btnCreate;
 
-    addUserVisible(event) {
-        //console.log(arr);
-        if(event.currentTarget.innerHTML === 'Add User' || event.currentTarget.innerHTML === 'Close') {
-            event.currentTarget.nextSibling.style.visibility = 'visible';
-            if (event.currentTarget.innerHTML === 'Close') {
-                event.currentTarget.nextSibling.style.visibility = 'hidden';
-                event.currentTarget.innerHTML = 'Add User';
-                this.Create.innerHTML = 'Create';
-            } else {
-                event.currentTarget.innerHTML = 'Close';
-            }
-        } else if(event.currentTarget.innerHTML === 'Delete') {
+        if(btnAddUser.innerHTML === 'Add User') {
+
+            formBlock.style.visibility = 'visible';
+            btnAddUser.innerHTML = 'Close';
+
+
+        } else if(btnAddUser.innerHTML === 'Delete') {
+
             let newArr = arr;
             arr = [];
             let elem = document.querySelectorAll('input[type="checkbox"]');
             for(let i = 0; i < newArr.length; i++){
                 let address = 'http://localhost:5001/user/' + newArr[i];
                 Axios.delete(address)
-                    .then((res) => {
+                    .then(() => {
                         this.props.onDeleteUser(newArr[i]);
                     })
                     .catch((err) => {
@@ -56,28 +37,43 @@ class App extends Component {
                     });
 
             }
+
             for(let i = 0; i < elem.length; i++){
+
                 console.log(elem[i].checked = false);
+
             }
 
-            event.currentTarget.innerHTML = 'Add User';
+            btnAddUser.innerHTML = 'Add User';
+
+        } else if(btnAddUser.innerHTML === 'Close'){
+
+            formBlock.style.visibility = 'hidden';
+            btnAddUser.innerHTML = 'Add User';
+            btnCreate.innerHTML = 'Create';
+
         }
+
     }
 
-    addUser(event) {
+    onClickCreateUser() {
+
+        let btnAddUser = this.btnAddUser;
+        let formBlock = this.formBlock;
+        let btnCreate = this.btnCreate;
 
         let name = this.name.value;
-        let age = this.age.value;
+        let age = Number(this.age.value);
 
-        if(event.target.innerHTML === 'Create') {
-            //console.log(event.currentTarget.parentNode);
+        if(btnCreate.innerHTML === 'Create' && !isNaN(age)) {
+            console.log(age);
             if (name !== '' && age !== '') {
+
                 Axios.post('http://localhost:5001/user', {
                     name: name,
                     age: age
                 })
                     .then((res) => {
-                        //console.log(res.data);
                         this.props.onAddUser(res.data);
                         this.name.value = '';
                         this.age.value = '';
@@ -85,13 +81,18 @@ class App extends Component {
                     .catch((err) => {
                         console.log(err);
                     });
-            } else {
-                alert('One of the fields is empty');
-            }
-            event.currentTarget.parentNode.style.visibility = 'hidden';
-            event.currentTarget.parentNode.previousSibling.innerHTML = 'Add User';
 
-        } else if (event.target.innerHTML === 'Update') {
+            } else {
+
+                alert('One of the fields is empty');
+
+            }
+
+            formBlock.style.visibility = 'hidden';
+            btnAddUser.innerHTML = 'Add User';
+
+        } else if (btnCreate.innerHTML === 'Update' && !isNaN(age)) {
+
             if(name !== '' && age !== '') {
                 let address = 'http://localhost:5001/user/' + active;
                 Axios.put(address, {
@@ -100,25 +101,33 @@ class App extends Component {
                 })
                     .then((res) => {
                         this.props.onUpdateUser(res.data);
-                        this.Create.innerHTML = 'Create';
+                        btnCreate.innerHTML = 'Create';
+                        btnAddUser.innerHTML = 'Add User';
                         this.name.value = '';
                         this.age.value = '';
+                        formBlock.style.visibility = 'hidden';
+
 
                     })
                     .catch((err) => {
                         console.log(err);
                     });
+
             } else{
+
                 alert('One of the fields is empty');
+
             }
+        } else {
+            alert('Age != Number');
         }
     }
 
-    userDle(event) {
+    onClickDeleteUser(event) {
+
         let id = event.target.getAttribute('name');
-        //console.log(event.target.getAttribute('name'));
-        console.log(typeof event.target.name);
         let address = 'http://localhost:5001/user/' + id;
+
         Axios.delete(address)
             .then((res) => {
                 this.props.onDeleteUser(id);
@@ -126,93 +135,122 @@ class App extends Component {
             .catch((err) => {
                 console.log(err);
             });
+
     }
 
-    delGroup(event) {
+    onClickCheckbox(event) {
+
+        let id = event.target.getAttribute('name');
+
+        let btnAddUser = this.btnAddUser;
+        let formBlock = this.formBlock;
 
         if(event.target.checked) {
-            arr.push(event.target.getAttribute('name'));
-            console.log('checked - ', arr);
+
+            arr.push(id);
+
         } else if(!event.target.checked) {
+
             let newArr = [];
+
             for(let i = 0; i < arr.length; i++){
-                if(arr[i] !== event.target.getAttribute('name')){
+
+                if(arr[i] !== id){
+
                     newArr.push(arr[i]);
+
                 }
+
             }
+
             arr = newArr;
-            console.log('NO checked - ', arr);
+
         }
+
         if(arr.length !== 0){
-            this.btn.innerHTML = 'Delete';
-            this.text.style.visibility = 'hidden';
-            //console.log(this.btn);
+
+            btnAddUser.innerHTML = 'Delete';
+            formBlock.style.visibility = 'hidden';
+
         } else {
-            this.btn.innerHTML = 'Add User';
+
+            btnAddUser.innerHTML = 'Add User';
+
         }
+
     }
 
-    updateUser(event) {
+    onClickUpdate(event) {
         active = event.target.getAttribute('name');
-        this.btn.innerHTML = 'Close';
-        this.text.style.visibility = 'visible';
-        this.Create.innerHTML = 'Update';
+        this.btnAddUser.innerHTML = 'Close';
+        this.formBlock.style.visibility = 'visible';
+        this.btnCreate.innerHTML = 'Update';
     }
 
     render() {
         return (
-            <div className={css(styles.block)}>
+            <div className="block">
                 <ul>
                     {this.props.store.map((user, index) =>
                         <snan
                             key={index}
-                            name={user._id}
-                            className={css(styles.span)}
-                            onMouseOut={this.out.bind(this)}
-                            onMouseOver={this.over.bind(this)}>
-                            <li className={css(styles.li)} >
+                            name={index}
+                            className="span">
+                            <li className="li" >
                                 <span
                                     name={user._id}
-                                    className={css(styles.del)}
-                                    onClick={this.userDle.bind(this)}
+                                    className="del"
+                                    onClick={this.onClickDeleteUser.bind(this)}
                                 >&#10006;</span>
                                 <input
-                                    onClick={this.delGroup.bind(this)}
+                                    onClick={this.onClickCheckbox.bind(this)}
                                     name={user._id}
-                                    className={css(styles.checkbox)}
+                                    className="checkbox"
                                     type='checkbox'
                                 />
                                 <span
-                                    className={css(styles.refactor)}>
+                                    className="refactor">
                                     Name: {user.name} | age: {user.age}
                                 </span>
                                 <span
                                     name={user._id}
-                                    onClick={this.updateUser.bind(this)}
-                                    className={css(styles.span2)}>
+                                    onClick={this.onClickUpdate.bind(this)}
+                                    className="span2">
                                     &#9998;
                                 </span>
                             </li>
                         </snan>
                     )}
-                    <span
-                        className={css(styles.spanAddUser)}
-                        onClick={this.addUserVisible.bind(this)}
-                        ref={(input) => {this.btn = input}}
-                    >
-                        Add User
-                    </span>
-                    <span ref={(input) => {this.text = input}} className={css(styles.btnAdd)}>
-                        <input type="text" ref={(input) => this.name = input} placeholder="Name"/>
-                        <input type="text" ref={(input) => this.age = input} placeholder="Age"/>
-                        <span
-                            ref={(input) => {this.Create = input}}
-                            onClick={this.addUser.bind(this)}
-                            className={css(styles.spanAddUser)}>
-                            Create
-                        </span>
-                    </span>
                 </ul>
+                <span
+                    className="spanAddUser"
+                    onClick={this.onClickBtnAddUser.bind(this)}
+                    ref={(input) => {this.btnAddUser = input}}
+                >
+                    Add User
+                </span>
+                <span
+                    ref={(input) => {this.formBlock = input}}
+                    className="btnAdd"
+                >
+                    <input
+                        type="text"
+                        ref={(input) => this.name = input}
+                        placeholder="Name"
+                    />
+                    <input
+                        type="text"
+                        ref={(input) => this.age = input}
+                        placeholder="Age"
+                    />
+                    <span
+                        ref={(input) => {this.btnCreate = input}}
+                        onClick={this.onClickCreateUser.bind(this)}
+                        className="spanAddUser"
+                    >
+                        Create
+                    </span>
+                </span>
             </div>
         );
     }
