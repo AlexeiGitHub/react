@@ -76,7 +76,7 @@ class ElemBtn extends Component {
 
 export default connect(
     state => ({
-        store: state
+        store: state.data
     }),
     dispatch => ({
         onAddUser: (user) => {
